@@ -2149,7 +2149,7 @@ static int __init rk29xx_spim_init(void)
 	return ret;
 }
 
-static void __exit rk29xx_spim_exit(void)
+void rk29xx_spim_exit(void)
 {
 	platform_driver_unregister(&rk29xx_platform_spim_driver);
 }

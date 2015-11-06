@@ -83,6 +83,10 @@
 
 static const char dwc_driver_name[] = "usb20_otg";
 
+// RetroFreak hack
+#include <linux/gpio.h>
+#define OTG_DRV_GPIO			165		// GPIO0_A5
+
 dwc_otg_device_t* g_otgdev = NULL;
 
 /*-------------------------------------------------------------------------*/
@@ -378,6 +382,12 @@ void dwc_otg_force_host(dwc_otg_core_if_t *core_if)
     	printk("dwc_otg_force_host,already in A_HOST mode,everest\n");
     	return;
     }
+
+	// RetroFreak hack - OTG_DRV handled manually
+#ifdef CONFIG_ARCH_RK30    
+	gpio_direction_output(OTG_DRV_GPIO, 1);
+#endif
+    
 	if((otg_dev->pcd)&&(otg_dev->pcd->phy_suspend == 1))
 	{
 		dwc_otg20phy_suspend( 1 );
@@ -421,7 +431,11 @@ void dwc_otg_force_device(dwc_otg_core_if_t *core_if)
     //otg_dev->pcd->phy_suspend = 1;
     otg_dev->pcd->vbus_status = 0;
     dwc_otg_pcd_start_vbus_timer( otg_dev->pcd );
-	
+    
+	// RetroFreak hack - OTG_DRV handled manually
+#ifdef CONFIG_ARCH_RK30    
+	gpio_direction_output(OTG_DRV_GPIO, 0);
+#endif	
 }
 static void dwc_otg_set_gusbcfg(dwc_otg_core_if_t *core_if, int mode)
 {
@@ -1586,7 +1600,8 @@ static __devinit int dwc_otg_driver_probe(struct platform_device *pdev)
 #if defined(CONFIG_ARCH_RK3066B)
     USB_IOMUX_INIT(GPIO3D5_PWM2_JTAGTCK_OTGDRVVBUS_NAME, GPIO3D_OTGDRVVBUS);
 #elif defined(CONFIG_ARCH_RK30)
-    USB_IOMUX_INIT(GPIO0A5_OTGDRVVBUS_NAME, GPIO0A_OTG_DRV_VBUS);    
+	// RetroFreak hack - this is handled manually in SW
+//    USB_IOMUX_INIT(GPIO0A5_OTGDRVVBUS_NAME, GPIO0A_OTG_DRV_VBUS);    
 #endif
 #ifdef CONFIG_ARCH_RK2928
     USB_IOMUX_INIT(GPIO3C1_OTG_DRVVBUS_NAME, GPIO3C_OTG_DRVVBUS);    
@@ -2285,7 +2300,8 @@ static __devinit int host20_driver_probe(struct platform_device *pdev)
 #if defined(CONFIG_ARCH_RK3066B)
     USB_IOMUX_INIT(GPIO3D6_PWM3_JTAGTMS_HOSTDRVVBUS_NAME, GPIO3D_HOSTDRVVBUS);
 #elif defined(CONFIG_ARCH_RK30)
-    USB_IOMUX_INIT(GPIO0A6_HOSTDRVVBUS_NAME, GPIO0A_HOST_DRV_VBUS);    
+	// RetroFreak hack - controller manually by retrofreak driver
+//    USB_IOMUX_INIT(GPIO0A6_HOSTDRVVBUS_NAME, GPIO0A_HOST_DRV_VBUS);    
 #endif
 	/*
 	 * Initialize the DWC_otg core.

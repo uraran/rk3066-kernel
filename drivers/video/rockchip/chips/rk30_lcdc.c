@@ -33,7 +33,7 @@
 #include "rk30_lcdc.h"
 
 
-#define RETRON_PATCH
+#define RETROFREAK_PATCH
 
 
 static int dbg_thresd = 0;
@@ -599,7 +599,7 @@ static  int win0_set_par(struct rk30_lcdc_device *lcdc_dev,rk_screen *screen,
 				break;
 		}
 		
-#ifdef RETRON_PATCH
+#ifdef RETROFREAK_PATCH
 		switch(par->format) 
 		{
 			case ARGB888:

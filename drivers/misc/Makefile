@@ -62,4 +62,4 @@ obj-y += inv_mpu/
 obj-$(CONFIG_RK29_NEWTON)	+= newton.o
 obj-$(CONFIG_TDSC8800) += tdsc8800.o
 obj-$(CONFIG_RK29_SC8800)	+=	sc8800.o
-obj-y += retron5/
+obj-y += retrofreak/

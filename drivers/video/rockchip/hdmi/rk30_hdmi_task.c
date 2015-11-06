@@ -145,8 +145,7 @@ static int hdmi_process_command(void)
 				}
 				break;	
 			case HDMI_CONFIG_COLOR:
-				if(state > CONFIG_VIDEO)
-					state = CONFIG_VIDEO;	
+				state = RECONFIG_COLOUR;	
 				break;
 			case HDMI_CONFIG_HDCP:
 				break;
@@ -181,7 +180,6 @@ void hdmi_work(struct work_struct *work)
 {
 	int hotplug, state_last;
 	int rc = HDMI_ERROR_SUCESS, trytimes = 0;
-	struct rk30_hdmi_video_para video;
 	
 	mutex_lock(&work_mutex);
 	/* Process hdmi command */
@@ -254,22 +252,22 @@ void hdmi_work(struct work_struct *work)
 				break;
 			case CONFIG_VIDEO:
 				hdmi->display = HDMI_DISABLE;
-				video.vic = hdmi->vic;
-				video.input_mode = VIDEO_INPUT_RGB_YCBCR_444;
-				video.input_color = VIDEO_INPUT_COLOR_RGB;//VIDEO_INPUT_COLOR_YCBCR
-				video.output_mode = hdmi->edid.sink_hdmi;
+				hdmi->video.vic = hdmi->vic;
+				hdmi->video.input_mode = VIDEO_INPUT_RGB_YCBCR_444;
+				hdmi->video.input_color = VIDEO_INPUT_COLOR_RGB;//VIDEO_INPUT_COLOR_YCBCR
+				hdmi->video.output_mode = hdmi->edid.sink_hdmi;
 				
 				if(hdmi->edid.ycbcr444)
-					video.output_color = VIDEO_OUTPUT_YCBCR444;
+					hdmi->video.output_color = VIDEO_OUTPUT_YCBCR444;
 				else if(hdmi->edid.ycbcr422)
-					video.output_color = VIDEO_OUTPUT_YCBCR422;
+					hdmi->video.output_color = VIDEO_OUTPUT_YCBCR422;
 				else
-					video.output_color = VIDEO_OUTPUT_RGB444;
+					hdmi->video.output_color = VIDEO_OUTPUT_RGB444;
 				// For DVI, output RGB
 				if(hdmi->edid.sink_hdmi == 0)
-					video.output_color = VIDEO_OUTPUT_RGB444;
+					hdmi->video.output_color = VIDEO_OUTPUT_RGB444;
 				
-				rc = rk30_hdmi_config_video(&video);
+				rc = rk30_hdmi_config_video(&hdmi->video);
 				if(rc == HDMI_ERROR_SUCESS)
 				{
 					if(hdmi->edid.sink_hdmi)
@@ -293,6 +291,16 @@ void hdmi_work(struct work_struct *work)
 					}
 				}
 				
+				if(hdmi->wait == 1) {	
+					complete(&hdmi->complete);
+					hdmi->wait = 0;						
+				}
+				break;
+			case RECONFIG_COLOUR:
+				// this is only used to switch between FULL/LIMITED modes for the CSC after a functional video mode
+				// is already configured, so no need to run through full video config again
+				rk30_hdmi_config_csc(&hdmi->video);
+				hdmi->state = PLAY_BACK;
 				if(hdmi->wait == 1) {	
 					complete(&hdmi->complete);
 					hdmi->wait = 0;						

@@ -32,7 +32,7 @@
 #include <plat/ipp.h>
 #include "hdmi/rk_hdmi.h"
 
-#define RETRON_PATCH
+#define RETROFREAK_PATCH
 
 #ifdef	CONFIG_FB_MIRRORING
 
@@ -265,7 +265,7 @@ static int rk_fb_ioctl(struct fb_info *info, unsigned int cmd,unsigned long arg)
 	{
  		case FBIOPUT_FBPHYADD:
 			return info->fix.smem_start;
-#ifndef RETRON_PATCH			
+#ifndef RETROFREAK_PATCH			
 		case FBIOSET_YUV_ADDR:   //when in video mode, buff alloc by android
 			if((!strcmp(fix->id,"fb1"))||(!strcmp(fix->id,"fb3")))
 			{
@@ -818,10 +818,10 @@ static int rk_request_fb_buffer(struct fb_info *fbi,int fb_id)
 				fbi->fix.smem_start,fbi->screen_base,fbi->fix.smem_len);
 			break;
 			
-			// modification for Retron - rather than the stock rk3066 kernel which leaves it to android
+			// modification for RetroFreak - rather than the stock rk3066 kernel which leaves it to android
 			// to setup the buffer for lcdc win0 (fb1/fb3), we configure this here using the memory reserved
-			// for IPP which is not used under Retron
-#ifdef RETRON_PATCH
+			// for IPP which is not used under RetroFreak
+#ifdef RETROFREAK_PATCH
 			case 1:
 				res = platform_get_resource_byname(g_fb_pdev, IORESOURCE_MEM, "ipp buf");
 				if (res == NULL)
@@ -857,7 +857,7 @@ static int rk_release_fb_buffer(struct fb_info *fbi)
 		printk("no need release null fb buffer!\n");
 		return -EINVAL;
 	}
-#ifndef RETRON_PATCH	
+#ifndef RETROFREAK_PATCH	
 	if(!strcmp(fbi->fix.id,"fb1")||!strcmp(fbi->fix.id,"fb3"))  //buffer for fb1 and fb3 are alloc by android
 		return 0;
 #endif		
@@ -1042,8 +1042,8 @@ int rk_fb_register(struct rk_lcdc_device_driver *dev_drv,
     {
 	    fb_inf->fb[fb_inf->num_fb-2]->fbops->fb_open(fb_inf->fb[fb_inf->num_fb-2],1);
 	    fb_inf->fb[fb_inf->num_fb-2]->fbops->fb_set_par(fb_inf->fb[fb_inf->num_fb-2]);
-#ifdef RETRON_PATCH
-		// For retron, we simply draw a solid white screen
+#ifdef RETROFREAK_PATCH
+		// For retrofreak, we simply draw a solid white screen
 		fb_set_cmap(fb_default_cmap(16), fb_inf->fb[fb_inf->num_fb-2]);
 		struct fb_fillrect whitefill = { 0, 0, 1280, 720, 15, 0 };
 		fb_inf->fb[fb_inf->num_fb-2]->fbops->fb_fillrect(fb_inf->fb[fb_inf->num_fb-2], &whitefill);

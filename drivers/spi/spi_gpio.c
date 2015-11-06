@@ -21,6 +21,7 @@
 #include <linux/init.h>
 #include <linux/platform_device.h>
 #include <linux/gpio.h>
+#include <linux/delay.h>
 
 #include <linux/spi/spi.h>
 #include <linux/spi/spi_bitbang.h>
@@ -109,6 +110,7 @@ static inline void setsck(const struct spi_device *spi, int is_on)
 
 static inline void setmosi(const struct spi_device *spi, int is_on)
 {
+	is_on = (is_on) ? 1 : 0; // bugfix for rk3066 RetroFreak
 	gpio_set_value(SPI_MOSI_GPIO, is_on);
 }
 
@@ -119,13 +121,7 @@ static inline int getmiso(const struct spi_device *spi)
 
 #undef pdata
 
-/*
- * NOTE:  this clocks "as fast as we can".  It "should" be a function of the
- * requested device clock.  Software overhead means we usually have trouble
- * reaching even one Mbit/sec (except when we can inline bitops), so for now
- * we'll just assume we never need additional per-bit slowdowns.
- */
-#define spidelay(nsecs)	do {} while (0)
+#define spidelay(x) ndelay(x)
 
 #include "spi_bitbang_txrx.h"
 

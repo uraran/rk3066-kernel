@@ -1572,7 +1572,8 @@ static int rk29_sdmmc_get_cd(struct mmc_host *mmc)
 
         	cdetect = rk29_sdmmc_read(host->regs, SDMMC_CDETECT);
 
-            cdetect = (cdetect & SDMMC_CARD_DETECT_N)?0:1;
+			// RetroFreak PCB-A use non-standard microSD connector with inverted function for the detect line
+			cdetect = (cdetect & SDMMC_CARD_DETECT_N)?1:0;
 
             break;
         }        

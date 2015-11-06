@@ -84,7 +84,7 @@ struct rk30_gpio_bank rk30_gpio_banks[] = {
 	RK30_GPIO_BANK(4),
 	RK30_GPIO_BANK(6),
 };
-EXPORT_SYMBOL(rk30_gpio_banks); // needs to be exported so that retron driver module my access it
+EXPORT_SYMBOL(rk30_gpio_banks); // needs to be exported so that retrofreak driver module my access it
 
 static inline void rk30_gpio_bit_op(void __iomem *regbase, unsigned int offset, u32 bit, unsigned char flag)
 {

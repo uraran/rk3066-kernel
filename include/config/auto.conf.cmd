@@ -509,7 +509,7 @@ deps_config := \
 	drivers/misc/cb710/Kconfig \
 	drivers/misc/eeprom/Kconfig \
 	drivers/misc/c2port/Kconfig \
-	drivers/misc/retron5/Kconfig \
+	drivers/misc/retrofreak/Kconfig \
 	drivers/misc/Kconfig \
 	drivers/s390/block/Kconfig \
 	drivers/block/drbd/Kconfig \

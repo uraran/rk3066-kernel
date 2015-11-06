@@ -687,7 +687,7 @@ static int __init spidev_init(void)
 }
 module_init(spidev_init);
 
-static void __exit spidev_exit(void)
+/*static */void /*__exit*/ spidev_exit(void)
 {
 	spi_unregister_driver(&spidev_spi_driver);
 	class_destroy(spidev_class);

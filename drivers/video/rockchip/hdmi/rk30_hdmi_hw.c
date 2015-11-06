@@ -303,18 +303,26 @@ static char coeff_csc[][24] = {
 		0x04, 0xa8, 0x00, 0x00, 0x07, 0x44, 0x02, 0xfb, 	//B
 	},
 	
+	// Added for RetroFreak to enable "full range" output over YCbCr
+		//G			B			R			Bias
+	{	//CSC_RGB_0_255_TO_YCBCR_0_255
+		0x11, 0xAD, 0x02, 0x00, 0x10, 0x53, 0x00, 0x80, 	//Cr
+		0x02, 0x58, 0x01, 0x32, 0x00, 0x75, 0x00, 0x00, 	//Y
+		0x11, 0x53, 0x10, 0xAD, 0x02, 0x00, 0x00, 0x80, 	//Cb
+	},	
 };
 
-static void rk30_hdmi_config_csc(struct rk30_hdmi_video_para *vpara)
+void rk30_hdmi_config_csc(struct rk30_hdmi_video_para *vpara)
 {
 	int i, mode;
 	char *coeff = NULL;
-		
+	
 	if( ((vpara->input_color == VIDEO_INPUT_COLOR_RGB) && (vpara->output_color == VIDEO_OUTPUT_RGB444)) ||
 		((vpara->input_color == VIDEO_INPUT_COLOR_YCBCR) && (vpara->output_color != VIDEO_OUTPUT_RGB444) ))
 	{
 		return;
 	}
+	
 	switch(vpara->vic)
 	{
 		case HDMI_720x480i_60Hz_4_3:
@@ -326,7 +334,12 @@ static void rk30_hdmi_config_csc(struct rk30_hdmi_video_para *vpara)
 		case HDMI_720x480p_60Hz_16_9:
 		case HDMI_720x576p_50Hz_16_9:
 			if(vpara->input_color == VIDEO_INPUT_COLOR_RGB)
-				mode = CSC_RGB_0_255_TO_ITU601_16_235;
+			{
+				if(hdmi->colour_mode == HDMI_COLOUR_MODE_FULL)
+					mode = CSC_RGB_0_255_TO_YCBCR_0_255;
+				else
+					mode = CSC_RGB_0_255_TO_ITU601_16_235;
+			}
 			else if(vpara->output_mode == OUTPUT_HDMI)
 				mode = CSC_ITU601_16_235_TO_RGB_16_235;
 			else
@@ -334,7 +347,12 @@ static void rk30_hdmi_config_csc(struct rk30_hdmi_video_para *vpara)
 			break;
 		default:
 			if(vpara->input_color == VIDEO_INPUT_COLOR_RGB)
-				mode = CSC_RGB_0_255_TO_ITU709_16_235;
+			{
+				if(hdmi->colour_mode == HDMI_COLOUR_MODE_FULL)
+					mode = CSC_RGB_0_255_TO_YCBCR_0_255;
+				else
+					mode = CSC_RGB_0_255_TO_ITU709_16_235;
+			}
 			else if(vpara->output_mode == OUTPUT_HDMI)
 				mode = CSC_ITU709_16_235_TO_RGB_16_235;
 			else

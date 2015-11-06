@@ -269,6 +269,8 @@ static int rda_bt_probe(struct platform_device *pdev)
     wake_lock_init(&rda_bt_wakelock, WAKE_LOCK_SUSPEND, "rda_bt_wake");
 #endif
 
+	// hostwake is not needed
+#if 0
     gpio_direction_input(pdata->wake_host_gpio.io);
     irq_num = gpio_to_irq(pdata->wake_host_gpio.io);
     ret = request_irq(irq_num, rda_bt_host_wake_irq, pdata->wake_host_gpio.enable, "rda_bt_host_wake",NULL);	   
@@ -278,6 +280,7 @@ static int rda_bt_probe(struct platform_device *pdev)
     	  irq_num = -1;
         goto error;
     }
+#endif
 
     mutex_init(&sem);	
     D_PRINTF("[## BT ##] init_module\n");

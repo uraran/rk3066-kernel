@@ -1570,15 +1570,6 @@ static struct platform_device *devices[] __initdata = {
 #ifdef CONFIG_SND_RK_SOC_HDMI
 	&rockchip_hdmi_audio,
 #endif
-/*
- * moved to retron5-driver for auto-detect
-#ifdef CONFIG_MT5931_MT6622
-	&device_mt6622,
-#endif
-#ifdef CONFIG_RDA_5876
-	&device_rda_bt,
-#endif
-*/
 };
 #ifdef CONFIG_HDMI_ITV
 static struct rkdisplay_platform_data hdmi_data = {

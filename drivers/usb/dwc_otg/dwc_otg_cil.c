@@ -925,10 +925,14 @@ void dwc_otg_core_host_init(dwc_otg_core_if_t *_core_if)
 	
 	/* Initialize Host Configuration Register */
 	init_fslspclksel(_core_if);
+	
 	/* we don't need full speed mode */
-	#if 0
-	if (_core_if->core_params->speed == DWC_SPEED_PARAM_FULL) 
+	
+	// RetroFreak - PCB-B HUB circuit was not designed to high speed specs, so disable high speed	
+	#if 1
+//	if (_core_if->core_params->speed == DWC_SPEED_PARAM_FULL) 
 	{
+		hcfg_data_t hcfg;
 		hcfg.d32 = dwc_read_reg32(&host_if->host_global_regs->hcfg);
 		hcfg.b.fslssupp = 1;
 		dwc_write_reg32(&host_if->host_global_regs->hcfg, hcfg.d32);

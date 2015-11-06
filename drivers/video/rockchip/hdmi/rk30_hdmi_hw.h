@@ -432,7 +432,8 @@ enum {
 	CSC_ITU601_16_235_TO_RGB_16_235,	//YCbCr 16-235 input to RGB 16-235 output according BT601
 	CSC_ITU709_16_235_TO_RGB_16_235,	//YCbCr 16-235 input to RGB 16-235 output according BT709
 	CSC_ITU601_16_235_TO_RGB_0_255,		//YCbCr 16-235 input to RGB 0-255 output according BT601
-	CSC_ITU709_16_235_TO_RGB_0_255		//YCbCr 16-235 input to RGB 0-255 output according BT709
+	CSC_ITU709_16_235_TO_RGB_0_255,		//YCbCr 16-235 input to RGB 0-255 output according BT709
+	CSC_RGB_0_255_TO_YCBCR_0_255,		//RGB 0-255 input to YCbCr 0-255 output added for RetroFreak
 };
 
 extern int rk30_hdmi_initial(void);
@@ -442,5 +443,6 @@ extern int rk30_hdmi_removed(void);
 extern int rk30_hdmi_config_video(struct rk30_hdmi_video_para *vpara);
 extern int rk30_hdmi_config_audio(struct hdmi_audio *audio);
 extern void rk30_hdmi_control_output(int enable);
+extern void rk30_hdmi_config_csc(struct rk30_hdmi_video_para *vpara);
 
 #endif

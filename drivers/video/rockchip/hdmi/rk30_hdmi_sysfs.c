@@ -19,7 +19,7 @@ static int hdmi_get_enable(struct rk_display_device *device)
 
 static int hdmi_set_enable(struct rk_display_device *device, int enable)
 {
-	struct hdmi *hdmi = device->priv_data;
+//	struct hdmi *hdmi = device->priv_data;
 	
 	mutex_lock(&hdmi->enable_mutex);
 	if(hdmi->enable == enable) {
@@ -159,6 +159,44 @@ static struct rk_display_driver display_hdmi = {
 	.probe = hdmi_display_probe,
 };
 
+static ssize_t colour_mode_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	int ret = snprintf(buf, PAGE_SIZE, "%d\n", hdmi->colour_mode);
+	buf[strlen(buf) + 1] = '\0';
+	return ret;
+}
+
+static ssize_t colour_mode_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+{
+	long int mode = 0;
+	int ret = kstrtol(buf, 10, &mode);
+	if(ret == 0)
+	{
+		if(mode != HDMI_COLOUR_MODE_LIMITED && mode != HDMI_COLOUR_MODE_FULL)
+			mode = HDMI_COLOUR_MODE_LIMITED;
+			
+		if(!hdmi->hotplug)
+			return count;
+		
+		if(hdmi->colour_mode == mode)
+		{
+			hdmi_dbg(hdmi->dev, "new colour mode matches old, nothing to do\n");
+			return count;
+		}
+			
+		// set the new colour mode
+		hdmi->colour_mode = mode;
+
+		// issue the command to the task handler to apply the new setting
+		hdmi->command = HDMI_CONFIG_COLOR;
+		init_completion(&hdmi->complete);
+		hdmi->wait = 1;
+		queue_delayed_work(hdmi->workqueue, &hdmi->delay_work, 0);
+		wait_for_completion_interruptible_timeout(&hdmi->complete, msecs_to_jiffies(10000));
+	}
+	return count;
+}
+
 static ssize_t edid_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
 	int ret;
@@ -221,15 +259,18 @@ static ssize_t vsync_show_event(struct device *dev, struct device_attribute *att
 
 static DEVICE_ATTR(vsync_event, S_IRUGO, vsync_show_event, NULL);
 static DEVICE_ATTR(edid, S_IRUGO | S_IWUGO, edid_show, edid_store);
+static DEVICE_ATTR(colour_mode, S_IRUGO | S_IWUGO, colour_mode_show, colour_mode_store);
 
 struct rk_display_device* hdmi_register_display_sysfs(struct hdmi *hdmi, struct device *parent)
 {
 	struct rk_display_device *dev = rk_display_device_register(&display_hdmi, parent, hdmi);
 	
-	// Add vsync event and edid probe to sysfs - retron
+	// Add vsync event, edid probe and colour mode config to sysfs - retrofreak
 	if(sysfs_create_file(&dev->dev->kobj, (const struct attribute *)&dev_attr_vsync_event))
 		hdmi_dbg(hdmi->dev, "failed to add vsync_event");
 	if(sysfs_create_file(&dev->dev->kobj, (const struct attribute *)&dev_attr_edid))
+		hdmi_dbg(hdmi->dev, "failed to add EDID access");
+	if(sysfs_create_file(&dev->dev->kobj, (const struct attribute *)&dev_attr_colour_mode))
 		hdmi_dbg(hdmi->dev, "failed to add EDID access");
 	
 	return dev;

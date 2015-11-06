@@ -182,7 +182,7 @@ static int __devinit rk30_hdmi_probe (struct platform_device *pdev)
 	register_early_suspend(&hdmi->early_suspend);
 	#endif
 	
-	// vsync related init - retron
+	// vsync related init - retrofreak
 	spin_lock_init(&hdmi->vsync_lock);
 	init_completion(&hdmi->vsync_comp);
 	hdmi->vsync_wait_cnt = 0;
@@ -199,6 +199,8 @@ static int __devinit rk30_hdmi_probe (struct platform_device *pdev)
 	
 	hdmi->edid_block = 0;
 	mutex_init(&hdmi->edid_mutex);
+	
+	hdmi->colour_mode = HDMI_COLOUR_MODE_LIMITED;
 	
 	/* get the IRQ */
 	hdmi->irq = platform_get_irq(pdev, 0);

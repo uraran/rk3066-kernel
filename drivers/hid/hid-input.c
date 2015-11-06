@@ -970,6 +970,13 @@ int hidinput_connect(struct hid_device *hid, unsigned int force)
 				 * the same interface. Some devices (e.g. Happ's
 				 * UGCI) cram a lot of unrelated inputs into the
 				 * same interface. */
+				
+				// Hack for RetroFreak - set the input "uniq" field to a sting designating
+				// the specific HID report that the device is tied to, which allows userland to determine
+				// which physical gamepad port location each input event is coming from
+				input_dev->uniq = (char *)kzalloc(64, GFP_KERNEL);
+				snprintf((char *)input_dev->uniq, 64, "hidreport_%d", report->id);
+				
 				hidinput->report = report;
 				if (hid->driver->input_register &&
 						hid->driver->input_register(hid, hidinput))

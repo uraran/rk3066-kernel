@@ -265,7 +265,7 @@ long has_wake_lock(int type)
 	long ret;
 	unsigned long irqflags;
 	
-	// Retron hack - NEVER allow deep sleep as its broken with our RAM IC's :(
+	// RetroFreak hack - NEVER allow deep sleep as its broken with our RAM IC's :(
 	if(type == WAKE_LOCK_SUSPEND)
 		return 1;
 	

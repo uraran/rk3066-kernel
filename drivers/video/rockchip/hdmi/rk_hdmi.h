@@ -131,6 +131,7 @@ enum hdmi_state{
 	CONFIG_VIDEO,
 	CONFIG_AUDIO,
 	PLAY_BACK,
+	RECONFIG_COLOUR,
 };
 
 // HDMI configuration command
