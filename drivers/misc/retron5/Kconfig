@@ -1,0 +1,4 @@
+
+config RETRON5_DRIVER
+	bool "Retron 5 driver"
+	default y
